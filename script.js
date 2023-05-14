@@ -1,113 +1,112 @@
-$(document).ready(function(){
-    var a=[
-            [ "","",""],
-            [ "","",""],
-            [ "","",""]
-            ];
+// Declare variables and initialize game settings
+const cells = document.querySelectorAll("td");
+const humanBtn = document.getElementById("human");
+const computerBtn = document.getElementById("computer");
+const message = document.getElementById("message");
+let currentPlayer = "X";
+let humanPlayer = "X";
+let computerPlayer = "O";
+let gameMode = "human";
 
-            $('#btnNext').click(function(){
-                var bvalidPlay=false;
-                //Human Play
-                //row=r=fila
-                for(r= 0; r <=2; r++){
-                    //column=c
-                for(c=0; c <=2; c++){
-                    if(a[r][c]!= $('#t' + r + c).val()){
-                        a[r][c]=$('#t' + r + c).val();
-                    }
+// Define function to handle cell clicks
+function handleClick() {
+  // Check if cell is already occupied or it's the computer's turn in computer mode
+  if (this.textContent !== "" || gameMode === "computer" && currentPlayer === computerPlayer) {
+    return;
+  }
 
-                }
+  // Mark the cell with the current player's symbol
+  this.textContent = currentPlayer;
 
-           }
+  // Check if the game has been won or if it's a draw
+  checkWin();
 
-            if (checkWhoWin()){
-                resetArray();
-                $('#forma')[0].reset();
-            }
-           // Computer play
-           do{
-                 r=  Math.floor(Math.random() * 3);  //0-2
-                  c= Math.floor(Math.random() * 3);   //0-2
-                console.log(r,'',c);
-                    if(a[r][c] == ""){
-                        a[r][c]="0";
-                        $('#t' + r + c).val("0");
-                        bValidPlay=true;
-                    }
+  // Switch to the next player's turn
+  switchPlayer(currentPlayer);
 
-                }while (!bValidPlay);
-                checkWhoWin('0','Computer');
-                if(checkWhoWin('x','Human')){
-                    resetArray();
-                    $('form').reset();
-                }
+  // If it's the computer's turn in computer mode, make a move after a delay
+  if (gameMode === "computer" && currentPlayer === computerPlayer) {
+    setTimeout(() => {
+      computerMove();
+      checkWin();
+      switchPlayer(currentPlayer);
 
-                //Validacion de quien gano
+    }, 1000);
+  }
+}
 
-            });
+// Define function to make a random move for the computer
+function computerMove() {
+  const emptyCells = Array.from(cells).filter((cell) => cell.textContent === "");
+  if (emptyCells.length === 0) {
+    return;
+  }
+  const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  randomCell.textContent = computerPlayer;
+}
 
-            function checkWhoWin(whoChar, whoGuy){
-     //Check if player win
-     var player =whoChar;
-     var whowin = '';
-     for(r=0; r <= 2; r++){// Horizontal check
-         if((a[r][0]==player) &&
-           (a[r][1]==player) &&
-           (a[r][2]==player)){
-                  whowin=whoGuy;
-              }
-     }
+// Define function to switch to the next player's turn
+function switchPlayer(player) {
+  if (gameMode === "human" && player === humanPlayer) {
+    currentPlayer = player === "X" ? "O" : "X";
+  } else {
+    currentPlayer = player === "O" ? "X" : "O";
+  }
+}
 
-     for(c=0; c<= 2; c++){ //vertical check
-      if((a[0][c]==player) &&
-        (a[1][c]==player) &&
-        (a[2][c]==player)){
-               whowin=whoGuy;
-           }
+// Define function to check if the game has been won or if it's a draw
+function checkWin() {
+  const winningCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  let winner = null;
+  winningCombos.forEach((combo) => {
+    if (
+      cells[combo[0]].textContent !== "" &&
+      cells[combo[0]].textContent === cells[combo[1]].textContent &&
+      cells[combo[1]].textContent === cells[combo[2]].textContent
+    ) {
+      winner = cells[combo[0]].textContent;
     }
+  });
 
-      whowin= ((a[0][0]==player) && (a[1][1]==player) &&
-                      (a[2][2]==player)? whoGuy : whowin);
-      whowin= ((a[2][0]==player) && (a[1][1]==player) &&
-                      (a[0][2]==player)? whoGuy : whowin);
+  if (winner) {
+    message.textContent = `${winner} wins!`;
+    cells.forEach((cell) => (cell.removeEventListener("click", handleClick)));
+    return;
+  }
 
-    var bWinner = false;
+  if (Array.from(cells).every((cell) => cell.textContent !== "")) {
+    message.textContent = "Draw!";
+    return;
+  }
+}
 
-     if(whowin.length >0) {
-         alert(whowin + ' win!!!');
-         bWinner= true;
-         return true;
-             }
-             var plays = 0;
-             for(r= 0; r <=2; r++){
-                //column=c
-            for(c=0; c <=2; c++){
-                if(a[r][c].length >0){
-                    plays ++;
+// Add event listeners to cells and buttons
+cells.forEach((cell) => cell.addEventListener("click", handleClick));
 
-                }
 
-            }
-
-       }
-       if(plays==9)
-       {
-            return true;
-       }
-       return false;
-
-       }
-
-       function resetArray(){
-       // var plays = 0;
-        for(r= 0; r <=2; r++){
-           //column=c
-       for(c=0; c <=2; c++){
-           a[r][c]='';
-           }
-
-       }
-
-       }
-
-    });
+humanBtn.addEventListener("click", () => {
+  gameMode = "human";
+  currentPlayer = humanPlayer;
+  message.textContent = "";
+  cells.forEach((cell) => {
+    cell.textContent = "";
+    cell.addEventListener("click", handleClick);
+  });
+  switchPlayer(humanPlayer);
+});
+computerBtn.addEventListener("click", () => {
+  gameMode = "computer";
+  currentPlayer = humanPlayer;
+  message.textContent = "";
+  cells.forEach((cell) => (cell.textContent = ""));
+  cells.forEach((cell) => (cell.addEventListener("click", handleClick)));
+});
