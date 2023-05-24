@@ -3,15 +3,45 @@ const cells = document.querySelectorAll("td");
 const humanBtn = document.getElementById("human");
 const computerBtn = document.getElementById("computer");
 const message = document.getElementById("message");
+const closeModalBtn = document.querySelector(".modal .close");
 
 let currentPlayer = "X";
-let humanPlayer = "X";
-let computerPlayer = "O";
+let player1 = "X";
+let player2 = "O";
 let gameMode = "human";
+
+// Function that removes modal from screen when called
+function closeModal() {
+  const modal = document.getElementById("choosePlayerModal");
+  modal.classList.remove("show");
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden", "true");
+}
+
+// Close the modal when the close button is clicked
+closeModalBtn.addEventListener("click", function () {
+  closeModal();
+});
+
+// Event listener for choosing X player
+document.getElementById("chooseX").addEventListener("click", function () {
+  player1 = "X";
+  player2 = "O";
+  closeModal();
+  currentPlayer = player1;
+});
+
+// Event listener for choosing O player
+document.getElementById("chooseO").addEventListener("click", function () {
+  player1 = "O";
+  player2 = "X";
+  closeModal();
+  currentPlayer = player1;
+});
 
 // Handle cell click event
 function handleClick() {
-  if (this.textContent !== "" || (gameMode === "computer" && currentPlayer === computerPlayer)) {
+  if (this.textContent !== "" || (gameMode === "computer" && currentPlayer === player2)) {
     return;
   }
 
@@ -19,12 +49,12 @@ function handleClick() {
   checkWin();
   switchPlayer();
 
-  if (gameMode === "computer" && currentPlayer === computerPlayer) {
+  if (gameMode === "computer" && currentPlayer === player2 && !message.textContent) {
     setTimeout(() => {
       computerMove();
       checkWin();
       switchPlayer();
-    }, 1000);
+    }, 800);
   }
 }
 
@@ -35,12 +65,12 @@ function computerMove() {
     return;
   }
   const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-  randomCell.textContent = computerPlayer;
+  randomCell.textContent = player2;
 }
 
 // Switch to the next player's turn
 function switchPlayer() {
-  currentPlayer = (currentPlayer === humanPlayer) ? computerPlayer : humanPlayer;
+  currentPlayer = (currentPlayer === player1) ? player2 : player1;
 }
 
 // Check if the game has been won or if it's a draw
@@ -61,6 +91,7 @@ function checkWin() {
     const [a, b, c] = combo;
     if (cells[a].textContent !== "" && cells[a].textContent === cells[b].textContent && cells[b].textContent === cells[c].textContent) {
       winner = cells[a].textContent;
+
     }
   });
 
@@ -77,21 +108,28 @@ function checkWin() {
 // Event listeners for cells and buttons
 cells.forEach((cell) => cell.addEventListener("click", handleClick));
 
+// Human Button Event listener
 humanBtn.addEventListener("click", () => {
+  document.getElementById("choosePlayerModal").classList.add("show");
+  document.getElementById("choosePlayerModal").style.display = "block";
+  document.getElementById("choosePlayerModal").setAttribute("aria-hidden", "false");
   gameMode = "human";
-  currentPlayer = humanPlayer;
+  currentPlayer = player1;
   message.textContent = "";
   cells.forEach((cell) => {
     cell.textContent = "";
     cell.addEventListener("click", handleClick);
   });
-  switchPlayer();
-  currentPlayer = humanPlayer; // Set the currentPlayer to humanPlayer (X) after switchPlayer()
+
 });
 
+//Computer Button Event listener
 computerBtn.addEventListener("click", () => {
+  document.getElementById("choosePlayerModal").classList.add("show");
+  document.getElementById("choosePlayerModal").style.display = "block";
+  document.getElementById("choosePlayerModal").setAttribute("aria-hidden", "false");
   gameMode = "computer";
-  currentPlayer = humanPlayer;
+  currentPlayer = player1;
   message.textContent = "";
   cells.forEach((cell) => cell.textContent = "");
   cells.forEach((cell) => cell.addEventListener("click", handleClick));
