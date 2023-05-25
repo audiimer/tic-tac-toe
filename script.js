@@ -10,6 +10,13 @@ let player1 = "X";
 let player2 = "O";
 let gameMode = "human";
 
+// Function that opens modal window when called
+function openModal() {
+  document.getElementById("choosePlayerModal").classList.add("show");
+  document.getElementById("choosePlayerModal").style.display = "block";
+  document.getElementById("choosePlayerModal").setAttribute("aria-hidden", "false");
+}
+
 // Function that removes modal from screen when called
 function closeModal() {
   const modal = document.getElementById("choosePlayerModal");
@@ -93,16 +100,16 @@ function checkWin() {
       winner = cells[a].textContent;
 
     }
+    if (winner) {
+      message.textContent = `${winner} wins!`;
+      cells.forEach((cell) => cell.removeEventListener("click", handleClick));
+    }
+
+    else if (Array.from(cells).every((cell) => cell.textContent !== "" && !winner)) {
+      message.textContent = "Draw!";
+    }
   });
 
-  if (winner) {
-    message.textContent = `${winner} wins!`;
-    cells.forEach((cell) => cell.removeEventListener("click", handleClick));
-  }
-
-  if (Array.from(cells).every((cell) => cell.textContent !== "")) {
-    message.textContent = "Draw!";
-  }
 }
 
 // Event listeners for cells and buttons
@@ -110,9 +117,7 @@ cells.forEach((cell) => cell.addEventListener("click", handleClick));
 
 // Human Button Event listener
 humanBtn.addEventListener("click", () => {
-  document.getElementById("choosePlayerModal").classList.add("show");
-  document.getElementById("choosePlayerModal").style.display = "block";
-  document.getElementById("choosePlayerModal").setAttribute("aria-hidden", "false");
+  openModal();
   gameMode = "human";
   currentPlayer = player1;
   message.textContent = "";
@@ -125,9 +130,7 @@ humanBtn.addEventListener("click", () => {
 
 //Computer Button Event listener
 computerBtn.addEventListener("click", () => {
-  document.getElementById("choosePlayerModal").classList.add("show");
-  document.getElementById("choosePlayerModal").style.display = "block";
-  document.getElementById("choosePlayerModal").setAttribute("aria-hidden", "false");
+  openModal();
   gameMode = "computer";
   currentPlayer = player1;
   message.textContent = "";
