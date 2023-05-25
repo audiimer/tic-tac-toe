@@ -23,11 +23,26 @@ function closeModal() {
   modal.classList.remove("show");
   modal.style.display = "none";
   modal.setAttribute("aria-hidden", "true");
+
+  if (gameMode === "human") {
+    cells.forEach((cell) => {
+      cell.addEventListener("click", handleClick);
+    });
+  }
+}
+
+// Function to clear all cells
+function clearCells() {
+  cells.forEach((cell) => {
+    cell.textContent = "";
+  });
 }
 
 // Close the modal when the close button is clicked
 closeModalBtn.addEventListener("click", function () {
+
   closeModal();
+  currentPlayer = player1;
 });
 
 // Event listener for choosing X player
@@ -36,6 +51,7 @@ document.getElementById("chooseX").addEventListener("click", function () {
   player2 = "O";
   closeModal();
   currentPlayer = player1;
+  clearCells();
 });
 
 // Event listener for choosing O player
@@ -44,6 +60,7 @@ document.getElementById("chooseO").addEventListener("click", function () {
   player2 = "X";
   closeModal();
   currentPlayer = player1;
+  clearCells();
 });
 
 // Handle cell click event
@@ -96,22 +113,35 @@ function checkWin() {
   let winner = null;
   winningCombos.forEach((combo) => {
     const [a, b, c] = combo;
-    if (cells[a].textContent !== "" && cells[a].textContent === cells[b].textContent && cells[b].textContent === cells[c].textContent) {
+    if (
+      cells[a].textContent !== "" &&
+      cells[a].textContent === cells[b].textContent &&
+      cells[b].textContent === cells[c].textContent
+    ) {
       winner = cells[a].textContent;
-
     }
+
     if (winner) {
       message.textContent = `${winner} wins!`;
-      cells.forEach((cell) => cell.removeEventListener("click", handleClick));
-    }
-
-    else if (Array.from(cells).every((cell) => cell.textContent !== "" && !winner)) {
+      setTimeout(() => {
+        cells.forEach((cell) => (cell.textContent = ""));
+        message.textContent = "";
+        currentPlayer = player1;
+      }, 1500);
+    } else if (
+      Array.from(cells).every(
+        (cell) => cell.textContent !== "" && !winner
+      )
+    ) {
       message.textContent = "Draw!";
+      setTimeout(() => {
+        cells.forEach((cell) => (cell.textContent = ""));
+        message.textContent = "";
+        currentPlayer = player1;
+      }, 1500);
     }
   });
-
 }
-
 // Event listeners for cells and buttons
 cells.forEach((cell) => cell.addEventListener("click", handleClick));
 
@@ -121,10 +151,7 @@ humanBtn.addEventListener("click", () => {
   gameMode = "human";
   currentPlayer = player1;
   message.textContent = "";
-  cells.forEach((cell) => {
-    cell.textContent = "";
-    cell.addEventListener("click", handleClick);
-  });
+  cells.forEach((cell) => cell.addEventListener("click", handleClick));
 
 });
 
@@ -134,6 +161,5 @@ computerBtn.addEventListener("click", () => {
   gameMode = "computer";
   currentPlayer = player1;
   message.textContent = "";
-  cells.forEach((cell) => cell.textContent = "");
   cells.forEach((cell) => cell.addEventListener("click", handleClick));
 });
