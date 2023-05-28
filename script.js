@@ -24,11 +24,6 @@ function closeModal() {
   modal.style.display = "none";
   modal.setAttribute("aria-hidden", "true");
 
-  if (gameMode === "human") {
-    cells.forEach((cell) => {
-      cell.addEventListener("click", handleClick);
-    });
-  }
 }
 
 // Function to clear all cells
@@ -42,7 +37,8 @@ function clearCells() {
 closeModalBtn.addEventListener("click", function () {
 
   closeModal();
-  currentPlayer = player1;
+
+
 });
 
 // Event listener for choosing X player
@@ -149,7 +145,6 @@ cells.forEach((cell) => cell.addEventListener("click", handleClick));
 humanBtn.addEventListener("click", () => {
   openModal();
   gameMode = "human";
-  currentPlayer = player1;
   message.textContent = "";
   cells.forEach((cell) => cell.addEventListener("click", handleClick));
 
@@ -159,7 +154,6 @@ humanBtn.addEventListener("click", () => {
 computerBtn.addEventListener("click", () => {
   openModal();
   gameMode = "computer";
-  currentPlayer = player1;
   message.textContent = "";
   cells.forEach((cell) => cell.addEventListener("click", handleClick));
 });
